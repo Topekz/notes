@@ -2,7 +2,6 @@
     <div id="mathBackground">
         <div id="mathEditor">
             <input @keyup.enter="sendData" type="text" id="mathInput" v-model="latex" />
-            <button @click="hide" style="background-color: rgb(185, 80, 80);">Cancel</button>
             <button @click="sendData">Insert</button>
         </div>
     </div>
@@ -48,7 +47,7 @@ export default {
     position: fixed;
     top: 0;
     left: 0;
-    background-color: rgba(1, 1, 1, 0.06);
+    background-color: rgba(1, 1, 1, 0.07);
     width: 100%;
     height: 100%;
     z-index: 10;
@@ -65,7 +64,7 @@ export default {
     box-sizing: border-box;
 }
 #mathEditor button {
-    background-color: rgb(38, 104, 212);
+    background-color: rgb(52, 120, 230);
     font-size: 14px;
     font-weight: 500;
     border: none;

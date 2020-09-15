@@ -5,20 +5,28 @@
             <input type="text" v-model="noteName" id="title">
             <br>
             <abbr style="text-decoration: none;" title="Bold"><button class="toolbarBtn" id="boldBtn" @click="bold" @mousedown="handleBtn"><b>B</b></button></abbr>
-            <abbr style="text-decoration: none;" title="Italic"><button class="toolbarBtn" id="italicBtn" @click="italic" @mousedown="handleBtn"><i>I</i></button></abbr>
-            <abbr style="text-decoration: none;" title="Underline"><button class="toolbarBtn" id="underlineBtn" @click="underline" @mousedown="handleBtn"><u>U</u></button></abbr>
-            <abbr style="text-decoration: none;" title="Strikethrough"><button class="toolbarBtn" id="strikeBtn" @click="strike" @mousedown="handleBtn"><s>S</s></button></abbr>
-            <abbr style="text-decoration: none;" title="Insert heading"><button class="toolbarBtn" id="headingBtn" @click="heading" @mousedown="handleBtn">H</button></abbr>
-            <abbr style="text-decoration: none;" title="Type superscript"><button class="toolbarBtn" id="superscriptBtn" @click="superscript" @mousedown="handleBtn">X<sup style="vertical-align: top; font-size: 0.7em;">2</sup></button></abbr>
-            <abbr style="text-decoration: none;" title="Type subscript"><button class="toolbarBtn" id="subscriptBtn" @click="subscript" @mousedown="handleBtn">X<sub style="vertical-align: bottom; font-size: 0.7em;">2</sub></button></abbr>
-            <abbr style="text-decoration: none;" title="Insert horizontal rule"><button class="toolbarBtn" id="hlineBtn" @click="hline" @mousedown="handleBtn"><b>––</b></button></abbr>
-            <abbr style="text-decoration: none;" title="Change colours"><button class="toolbarBtn" id="colourBtn" style="width: 60px;" @click="colour" @mousedown="handleBtn">Colour</button></abbr>
+            <abbr style="text-decoration: none;" title="Italic"><button class="toolbarBtn" id="italicBtn" @click="italic" @mousedown="handleBtn"><b><i>I</i></b></button></abbr>
+            <abbr style="text-decoration: none;" title="Underline"><button class="toolbarBtn" id="underlineBtn" @click="underline" @mousedown="handleBtn"><b><u>U</u></b></button></abbr>
+            <abbr style="text-decoration: none;" title="Strikethrough"><button class="toolbarBtn" id="strikeBtn" @click="strike" @mousedown="handleBtn"><b><s>S</s></b></button></abbr>
+            <abbr style="text-decoration: none;" title="Insert heading"><button class="toolbarBtn" id="headingBtn" @click="heading" @mousedown="handleBtn"><b>H</b></button></abbr>
+            <abbr style="text-decoration: none;" title="Type superscript"><button class="toolbarBtn" id="superscriptBtn" @click="superscript" @mousedown="handleBtn"><b>X<sup style="vertical-align: top; font-size: 0.7em;">2</sup></b></button></abbr>
+            <abbr style="text-decoration: none;" title="Type subscript"><button class="toolbarBtn" id="subscriptBtn" @click="subscript" @mousedown="handleBtn"><b>X<sub style="vertical-align: bottom; font-size: 0.7em;">2</sub></b></button></abbr>
+            <abbr style="text-decoration: none;" title="Clear formatting"><button class="toolbarBtn" id="clearBtn" @click="clear" @mousedown="handleBtn"><b><i><s>T</s></i></b></button></abbr>
+            <abbr style="text-decoration: none;" title="Insert horizontal rule"><button class="toolbarBtn" id="hlineBtn" @click="hline" @mousedown="handleBtn"><b>–</b></button></abbr>
+            <abbr style="text-decoration: none;" title="Highlight text"><button class="toolbarBtn" id="highlightBtn" style="width: 80px;" @click="highlight" @mousedown="handleBtn">Highlight</button></abbr>
             <input type="file" id="imageSelect" style="display: none;" @change="image"/>
             <abbr style="text-decoration: none;" title="Insert image"><button class="toolbarBtn" id="imageBtn" style="width: 60px;" onclick="document.querySelector('#imageSelect').click()">Image</button></abbr>
-            <abbr style="text-decoration: none;" title="Insert math equation"><button class="toolbarBtn" id="mathBtn" style="width: 60px;" @click="math(true)" @mousedown="handleBtn">Math</button></abbr>
+            <abbr style="text-decoration: none;" title="Insert math equation"><button class="toolbarBtn" id="mathBtn" style="width: 55px;" @click="math(true)" @mousedown="handleBtn">Math</button></abbr>
+        </div>
+        <div id="highlightDropdown">
+            <button @click="highlight('clear')"><b>Clear</b></button><br>
+            <button @click="highlight('red')">Red</button><br>
+            <button @click="highlight('green')">Green</button><br>
+            <button @click="highlight('blue')">Blue</button><br>
+            <button @click="highlight('yellow')">Yellow</button><br>
         </div>
         <div class="editor" @click="handleClick">
-            <mathEditor v-if="mathEditor" v-bind:lastLatex="lastLatex" @hide="math" @sendData="insertMath" />
+            <mathEditor v-if="mathEditor" v-bind:lastLatex="lastLatex" @sendData="insertMath" />
             <div id="textarea" contenteditable @input="handleInput" @keyup="getStyle" @click="getStyle" spellcheck="false"></div>
             <button v-on:click="save">Save</button>
             <button v-on:click="load">Load</button>
@@ -46,6 +54,10 @@ export default {
         }
     },
     methods: {
+        clear: function() {
+            document.execCommand('removeFormat', false, '');
+            document.execCommand('formatBlock', false, 'div');
+        },
         bold: function() {
             document.execCommand('bold', false, '');
             if(document.querySelector("#boldBtn").classList.contains("toolbarHighlight")) {
@@ -101,8 +113,33 @@ export default {
             document.execCommand('formatBlock', false, 'h2');
             document.querySelector("#headingBtn").classList.add("toolbarHighlight");
         },
-        colour: function() {
-
+        highlight: function(action) {
+            switch(action) {
+                case "clear":
+                    document.execCommand('removeFormat', false, 'backColor');
+                    break;
+                case "red":
+                    document.execCommand('backColor', false, 'red');
+                    break;
+                case "green":
+                    document.execCommand('backColor', false, 'green');
+                    break;
+                case "blue":
+                    document.execCommand('backColor', false, 'blue');
+                    break;
+                case "yellow":
+                    document.execCommand('backColor', false, 'yellow');
+                    break;
+                default:
+                    if(document.getElementById("highlightDropdown").style.display == "inline-block") {
+                        document.getElementById("highlightDropdown").style.display = "none";
+                        document.querySelector("#highlightBtn").classList.remove("toolbarHighlight");
+                    } else {
+                        document.getElementById("highlightDropdown").style.display = "inline-block";
+                        document.querySelector("#highlightBtn").classList.add("toolbarHighlight");
+                    }
+                    break;
+            }
         },
         handleInput: function(e) {
             this.noteContent = e.target.innerHTML;
@@ -301,20 +338,22 @@ body {
 
 }
 .editor {
-    margin: 100px auto auto auto;
+    margin: auto;
+    padding: 95px 50px 10px 50px;
     width: 800px;
 }
 .toolbar {
     background-color: white;
     height: auto;
     width: 100%;
-    padding: 0 50px 0 50px;
+    padding: 0 100px 0 100px;
     box-sizing: border-box;
     position: fixed;
     top: 0;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.151);
     white-space: nowrap;
     overflow: hidden;
+    z-index: 1;
 }
 .toolbarBtn {
     cursor: pointer;
@@ -322,10 +361,10 @@ body {
     color: rgb(66, 66, 66);
     border: none;
     outline: none;
-    font-size: 15px;
-    margin: 5px;
-    width: 30px;
-    height: 30px;
+    font-size: 14px;
+    margin: 8px 2px 8px 2px;
+    width: 27px;
+    height: 25px;
     border-radius: 5px;
 }
 .toolbarHighlight {
@@ -339,7 +378,7 @@ body {
     background-color: white;
     outline: none;
     width: 100%;
-    min-height: 500px;
+    min-height: 1120px;
     box-sizing: border-box;
     padding: 25px;
     word-wrap: break-word;
@@ -350,7 +389,7 @@ body {
 }
 #logo {
     font-size: 18px;
-    margin: 10px 30px -20px 10px;
+    margin: 13px 42px -20px 2px;
     padding: 0;
     font-weight: bold;
     display: inline-block;
@@ -363,8 +402,48 @@ body {
     color: rgb(0, 0, 0);
     font-size: 17px;
     border: none;
+    padding: 2px 10px;
+    box-sizing: border-box;
+}
+#title:focus {
+    background-color: rgb(248, 249, 250);
+    border-radius: 5px;
+}
+#title:hover {
+    background-color: rgb(248, 249, 250);
+    border-radius: 5px;
+}
+#highlightDropdown {
+    background-color: white;
+    position: fixed;
+    margin: 65px 0 0 381px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.151);
+    padding: 20px 10px 10px 10px;
+    border-radius: 5px;
+    display: none;
+}
+#highlightDropdown button {
+    cursor: pointer;
+    background-color: white;
+    color: rgb(66, 66, 66);
+    border: none;
+    outline: none;
+    font-size: 13px;
+    width: 60px;
+    height: 25px;
+    border-radius: 5px;
+    margin: 0 0 4px 0;
+}
+#highlightDropdown button:hover {
+    background-color: rgb(248, 249, 250);
 }
 img {
     cursor: pointer;
+}
+::selection {
+  background: rgb(215, 234, 255);
+}
+::-moz-selection {
+  background: rgb(215, 234, 255);
 }
 </style>
