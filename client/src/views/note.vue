@@ -19,15 +19,15 @@
             <abbr style="text-decoration: none;" title="Insert math equation"><button class="toolbarBtn" id="mathBtn" style="width: 55px;" @click="math(true)" @mousedown="handleBtn">Math</button></abbr>
         </div>
         <div id="highlightDropdown">
-            <button @click="highlight('clear')"><b>Clear</b></button><br>
-            <button @click="highlight('red')">Red</button><br>
-            <button @click="highlight('green')">Green</button><br>
-            <button @click="highlight('blue')">Blue</button><br>
-            <button @click="highlight('yellow')">Yellow</button><br>
+            <button @click="highlight('clear')" @mousedown="handleBtn"><b>Clear</b></button><br>
+            <button @click="highlight('red')" @mousedown="handleBtn">Red</button><br>
+            <button @click="highlight('green')" @mousedown="handleBtn">Green</button><br>
+            <button @click="highlight('blue')" @mousedown="handleBtn">Blue</button><br>
+            <button @click="highlight('yellow')" @mousedown="handleBtn">Yellow</button><br>
         </div>
         <div class="editor" @click="handleClick">
             <mathEditor v-if="mathEditor" v-bind:lastLatex="lastLatex" @sendData="insertMath" />
-            <div id="textarea" contenteditable @input="handleInput" @keyup="getStyle" @click="getStyle" spellcheck="false"></div>
+            <div id="textarea" contenteditable @input="handleInput" @paste="handlePaste" @drop="handleDrop" @keyup="getStyle" @click="getStyle" spellcheck="false"></div>
             <button v-on:click="save">Save</button>
             <button v-on:click="load">Load</button>
         </div>
@@ -50,7 +50,8 @@ export default {
             focused: false,
             mathEditor: false,
             lastMath: "",
-            lastLatex: ""
+            lastLatex: "",
+            lastDrag: null
         }
     },
     methods: {
@@ -141,18 +142,89 @@ export default {
                     break;
             }
         },
-        handleInput: function(e) {
-            this.noteContent = e.target.innerHTML;
+        handleInput: function() {
+            this.noteContent = document.getElementById("textarea").innerHTML;
+        },
+        handlePaste: function(e) {
+            // Temporary
+            if (confirm("Remove formatting before pasting?")) {
+                e.preventDefault();
+                for(let i = 0; i < e.clipboardData.items.length; i++) {
+                    if(e.clipboardData.items[i].type.includes("image")) {
+                        console.log(e.clipboardData.items[i]);
+                        this.insertImage(e.clipboardData.items[i].getAsFile());
+                    }
+                }
+                document.execCommand('inserttext', false, e.clipboardData.getData('text/plain'));
+            }
+        },
+        handleDrop: function(e) {
+            // Temporary
+            console.log(e);
         },
         handleBtn: function(e) {
             e.preventDefault();
         },
-        handleClick: function(event) {
-            if(event.target.className == "mathImage") {
-                let id = event.target.id;
-                let latex = document.getElementById(id).src.replace('https://latex.codecogs.com/gif.latex?','');
-                this.editMath(id, latex);
+        handleClick: function(e) {
+            if(e.target.tagName == "IMG") {
+                if(e.target.className == "mathImage") {
+                    let id = e.target.id;
+                    let latex = document.getElementById(id).getAttribute("alt");
+                    this.editMath(id, latex);
+                } else {
+                    console.log("image");
+                }
             }
+        },
+        image: function() {
+            var file = document.querySelector("input[type=file]").files[0];
+            this.insertImage(file);
+        },
+        insertImage: function(file) {
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+                document.execCommand("InsertHTML", false, "<img src='" + e.target.result + "'/>");
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        },
+        math: function(state) {
+            if(state == true) {
+                // Generate id
+                let firstPart = (Math.random() * 46656) | 0;
+                let secondPart = (Math.random() * 46656) | 0;
+                firstPart = ("000" + firstPart.toString(36)).slice(-3);
+                secondPart = ("000" + secondPart.toString(36)).slice(-3);
+                let id = firstPart + secondPart;
+                this.lastMath = id;
+
+                // Place image
+                document.getElementById("textarea").focus();
+                document.execCommand("InsertHTML", false, `<img class="mathImage" id="`+ id + `" src="" alt=""/>`);
+
+                // Show editor
+                this.lastLatex = "";
+                this.mathEditor = true;
+            } else {
+                // Hide editor
+                this.mathEditor = false;
+            }
+        },
+        insertMath: function(latex) {
+            console.log(latex);
+            document.getElementById(this.lastMath).src = "https://latex.codecogs.com/gif.latex?" + latex;
+            document.getElementById(this.lastMath).setAttribute("alt", latex);
+            this.noteContent = document.getElementById("textarea").innerHTML;
+            this.math(false);
+        },
+        editMath: function(id, latex) {
+            console.log(id + ": " + latex);
+            this.lastMath = id;
+            this.mathEditor = true;
+            this.lastLatex = latex;
         },
         getStyle: function() {
             // Found this online. Don't know how it fully works lol
@@ -263,64 +335,11 @@ export default {
             else
                 document.querySelector("#headingBtn").classList.remove("toolbarHighlight");
         },
-        image: function() {
-            var file = document.querySelector("input[type=file]").files[0];
-            var reader = new FileReader();
-            let dataURI;
-
-            reader.addEventListener(
-                "load",
-                function() {
-                    dataURI = reader.result;
-
-                    const img = document.createElement("img");
-                    img.src = dataURI;
-                    document.execCommand("InsertHTML", false, "<img src='" + img.src + "'/>");
-                },
-                false
-            );
-            if (file) {
-                reader.readAsDataURL(file);
-            }
-        },
-        math: function(state) {
-            if(state == true) {
-                // Generate id
-                let firstPart = (Math.random() * 46656) | 0;
-                let secondPart = (Math.random() * 46656) | 0;
-                firstPart = ("000" + firstPart.toString(36)).slice(-3);
-                secondPart = ("000" + secondPart.toString(36)).slice(-3);
-                let id = firstPart + secondPart;
-                this.lastMath = id;
-
-                // Place image
-                document.getElementById("textarea").focus();
-                document.execCommand("InsertHTML", false, `<img class="mathImage" id="`+ id + `" src="" />`);
-
-                // Show editor
-                this.lastLatex = "";
-                this.mathEditor = true;
-            } else {
-                // Hide editor
-                this.mathEditor = false;
-            }
-        },
-        insertMath: function(latex) {
-            console.log(latex);
-            document.getElementById(this.lastMath).src = "https://latex.codecogs.com/gif.latex?" + latex;
-            this.math(false);
-        },
-        editMath: function(id, latex) {
-            console.log(id + ": " + latex);
-            this.lastMath = id;
-            this.mathEditor = true;
-            this.lastLatex = latex;
-        },
         save: function() {
             
         },
         load: function() {
-            this.noteContent = "";
+            this.noteContent = this.noteContent + this.noteContent;
             document.getElementById("textarea").innerHTML = this.noteContent;
         }
     },
@@ -372,7 +391,7 @@ body {
     color: rgb(75, 117, 255) !important;
 }
 .toolbarBtn:hover {
-    background-color: rgb(248, 249, 250);
+    background-color: rgb(240, 240, 240);
 }
 #textarea {
     background-color: white;
@@ -406,11 +425,11 @@ body {
     box-sizing: border-box;
 }
 #title:focus {
-    background-color: rgb(248, 249, 250);
+    background-color: rgb(240, 240, 240);
     border-radius: 5px;
 }
 #title:hover {
-    background-color: rgb(248, 249, 250);
+    background-color: rgb(240, 240, 240);
     border-radius: 5px;
 }
 #highlightDropdown {
@@ -435,7 +454,7 @@ body {
     margin: 0 0 4px 0;
 }
 #highlightDropdown button:hover {
-    background-color: rgb(248, 249, 250);
+    background-color: rgb(240, 240, 240);
 }
 img {
     cursor: pointer;
