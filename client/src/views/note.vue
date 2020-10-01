@@ -13,10 +13,11 @@
             <abbr style="text-decoration: none;" title="Type subscript"><button class="toolbarBtn" id="subscriptBtn" @click="subscript" @mousedown="handleBtn"><b>X<sub style="vertical-align: bottom; font-size: 0.7em;">2</sub></b></button></abbr>
             <abbr style="text-decoration: none;" title="Clear formatting"><button class="toolbarBtn" id="clearBtn" @click="clear" @mousedown="handleBtn"><b><i><s>T</s></i></b></button></abbr>
             <abbr style="text-decoration: none;" title="Insert horizontal rule"><button class="toolbarBtn" id="hlineBtn" @click="hline" @mousedown="handleBtn"><b>–</b></button></abbr>
-            <abbr style="text-decoration: none;" title="Highlight text"><button class="toolbarBtn" id="highlightBtn" style="width: 80px;" @click="highlight" @mousedown="handleBtn">Highlight</button></abbr>
+            <abbr style="text-decoration: none;" title="Highlight text"><button class="toolbarBtn" id="highlightBtn" style="width: 75px;" @click="highlight" @mousedown="handleBtn">Highlight</button></abbr>
             <input type="file" id="imageSelect" style="display: none;" @change="image"/>
-            <abbr style="text-decoration: none;" title="Insert image"><button class="toolbarBtn" id="imageBtn" style="width: 60px;" onclick="document.querySelector('#imageSelect').click()">Image</button></abbr>
-            <abbr style="text-decoration: none;" title="Insert math equation"><button class="toolbarBtn" id="mathBtn" style="width: 55px;" @click="math(true)" @mousedown="handleBtn">Math</button></abbr>
+            <abbr style="text-decoration: none;" title="Insert image"><button class="toolbarBtn" id="imageBtn" style="width: 55px;" onclick="document.querySelector('#imageSelect').click()">Image</button></abbr>
+            <abbr style="text-decoration: none;" title="Insert math equation"><button class="toolbarBtn" id="mathBtn" style="width: 50px;" @click="math(true)" @mousedown="handleBtn">Math</button></abbr>
+            <abbr style="text-decoration: none;" title="Toggle safe pasting"><button class="toolbarBtn" id="safepasteBtn" style="width: 85px;" @click="safepaste" @mousedown="handleBtn">Safe Paste</button></abbr>
         </div>
         <div id="highlightDropdown">
             <button @click="highlight('clear')" @mousedown="handleBtn"><b>Clear</b></button><br>
@@ -27,7 +28,7 @@
         </div>
         <div class="editor" @click="handleClick">
             <mathEditor v-if="mathEditor" v-bind:lastLatex="lastLatex" @sendData="insertMath" />
-            <div id="textarea" contenteditable @input="handleInput" @paste="handlePaste" @drop="handleDrop" @keyup="getStyle" @click="getStyle" spellcheck="false"></div>
+            <div id="textarea" contenteditable @input="handleInput" @paste="handlePaste" @keyup="getStyle" @click="getStyle" spellcheck="false"></div>
             <button v-on:click="save">Save</button>
             <button v-on:click="load">Load</button>
         </div>
@@ -51,7 +52,7 @@ export default {
             mathEditor: false,
             lastMath: "",
             lastLatex: "",
-            lastDrag: null
+            safePaste: false
         }
     },
     methods: {
@@ -142,25 +143,27 @@ export default {
                     break;
             }
         },
+        safepaste: function() {
+            if(!this.safePaste) {
+                this.safePaste = true;
+                document.querySelector("#safepasteBtn").classList.add("toolbarHighlight");
+            } else {
+                this.safePaste = false;
+                document.querySelector("#safepasteBtn").classList.remove("toolbarHighlight");
+            }
+        },
         handleInput: function() {
             this.noteContent = document.getElementById("textarea").innerHTML;
         },
         handlePaste: function(e) {
-            // Temporary
-            if (confirm("Remove formatting before pasting?")) {
+            if(this.safePaste) {
+                // Prevent default behaviour
                 e.preventDefault();
-                for(let i = 0; i < e.clipboardData.items.length; i++) {
-                    if(e.clipboardData.items[i].type.includes("image")) {
-                        console.log(e.clipboardData.items[i]);
-                        this.insertImage(e.clipboardData.items[i].getAsFile());
-                    }
-                }
-                document.execCommand('inserttext', false, e.clipboardData.getData('text/plain'));
+                // Get clipboard data
+                var clipboard = e.clipboardData.getData('text/plain');
+                // Insert text
+                document.execCommand('insertText', false, clipboard);
             }
-        },
-        handleDrop: function(e) {
-            // Temporary
-            console.log(e);
         },
         handleBtn: function(e) {
             e.preventDefault();
@@ -215,8 +218,12 @@ export default {
         },
         insertMath: function(latex) {
             console.log(latex);
-            document.getElementById(this.lastMath).src = "https://latex.codecogs.com/gif.latex?" + latex;
-            document.getElementById(this.lastMath).setAttribute("alt", latex);
+            if(latex != "") {
+                document.getElementById(this.lastMath).src = "https://latex.codecogs.com/gif.latex?" + latex;
+                document.getElementById(this.lastMath).setAttribute("alt", latex);
+            } else {
+                document.getElementById(this.lastMath).remove();
+            }
             this.noteContent = document.getElementById("textarea").innerHTML;
             this.math(false);
         },
@@ -448,7 +455,7 @@ body {
     border: none;
     outline: none;
     font-size: 13px;
-    width: 60px;
+    width: 55px;
     height: 25px;
     border-radius: 5px;
     margin: 0 0 4px 0;
