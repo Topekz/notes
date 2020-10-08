@@ -14,7 +14,7 @@ router.post("/", async (req,res) => {
     }
     var validUser = /^[0-9a-zA-Z]+$/;
     if(!username.match(validUser)) {
-        return res.json({success: false, msg: "Name has invalid characters"})
+        return res.json({success: false, msg: "Name has invalid characters"});
     }
 
     // Validate password
@@ -23,12 +23,12 @@ router.post("/", async (req,res) => {
     }
     var validPassword = /^[a-zA-Z\d\-_.,#@!?€$&%+*^'/\\s]+$/;
     if(!password.match(validPassword)) {
-        return res.json({success: false, msg: "Password has invalid characters"})
+        return res.json({success: false, msg: "Password has invalid characters"});
     }
 
     // Check if exists
     if(await User.findOne({username: username})) {
-        return res.json({success: false, msg: "User already exists"})
+        return res.json({success: false, msg: "User already exists"});
     }
 
     // Hash & salt
@@ -47,13 +47,6 @@ router.post("/", async (req,res) => {
     } catch(error) {
         res.json({success: false, msg: "Error", data: error});
     }
-});
-
-router.get("/", (req,res) => {
-    //Temp
-    User.find().exec(function(err, data) {
-        res.send(data);
-    });
 });
 
 module.exports = router;

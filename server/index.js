@@ -23,8 +23,8 @@ app.get('/', (req,res) => {
 const userRoute = require("./routes/user.js");
 app.use("/user", userRoute);
 // Get note data
-const noteRoute = require("./routes/note.js");
-app.use("/note", noteRoute);
+const notesRoute = require("./routes/notes.js");
+app.use("/notes", notesRoute);
 // Register user
 const registerRoute = require("./routes/register.js");
 app.use("/register", registerRoute);

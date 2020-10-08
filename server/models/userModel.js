@@ -19,7 +19,8 @@ const userSchema = mongoose.Schema({
         default: Date.now
     },
     notes: {
-        type: Array
+        type: Array,
+        default: []
     }
 });
 

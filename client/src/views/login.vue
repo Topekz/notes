@@ -1,11 +1,11 @@
 <template>
     <div class="container">
-        <h1>Register</h1>
+        <h1>Log In</h1>
         <div class="register">
             <p v-if="errorMsg.length > 0">{{ errorMsg }}</p>
-            <input v-model="name" pattern="^[0-9a-zA-Z]+$" style="text-transform: lowercase" type="text" name="name" id="name">
-            <input v-model="password" pattern="^[a-zA-Z\d\-_.,#@!?€$&%+*^'/\\s]+$" type="password" name="password" id="password">
-            <button @click="register" id="submit">Submit</button>
+            <input v-model="name" type="text" name="name" id="name">
+            <input v-model="password" type="password" name="password" id="password">
+            <button @click="register" id="submit">Log In</button>
         </div>
     </div>
 </template>
@@ -14,7 +14,7 @@
 import axios from 'axios';
 
 export default {
-    name: "landing",
+    name: "login",
     data() {
         return {
             name: "",
@@ -24,7 +24,7 @@ export default {
     },
     methods: {
         register: function() {
-            axios(process.env.VUE_APP_SERVER + '/register', {
+            axios(process.env.VUE_APP_SERVER + '/login', {
                 method: 'post',
                 data: {username: this.name, password: this.password},
                 withCredentials: true

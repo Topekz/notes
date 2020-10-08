@@ -8,7 +8,8 @@ const noteSchema = mongoose.Schema({
         required: true
     },
     data: {
-        type: String
+        type: String,
+        default: ""
     },
     owner: {
         type: String,
