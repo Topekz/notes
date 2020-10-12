@@ -22,4 +22,13 @@ router.post("/", verify, async (req,res) => {
     }
 });
 
+// Temporary
+router.get("/", (req,res) => {
+    Note
+    .find()
+    .exec(function(err, data) {
+        return res.send(data);
+    });
+});
+
 module.exports = router;

@@ -4,7 +4,7 @@ const User = require("../models/userModel.js");
 const verify = require("./verify.js");
 
 router.post("/", (req,res) => {
-
+    
 });
 
 router.get("/", verify, (req,res) => {

@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="toolbar">
-            <p id="logo" onclick="window.location.href='/'">Notes</p>
+            <p id="logo" @click="$router.push('/notes')">Notes</p>
             <input type="text" v-model="noteName" id="title">
             <br>
             <abbr style="text-decoration: none;" title="Bold"><button class="toolbarBtn" id="boldBtn" @click="bold" @mousedown="handleBtn"><b>B</b></button></abbr>
@@ -18,6 +18,10 @@
             <abbr style="text-decoration: none;" title="Insert image"><button class="toolbarBtn" id="imageBtn" style="width: 55px;" onclick="document.querySelector('#imageSelect').click()">Image</button></abbr>
             <abbr style="text-decoration: none;" title="Insert math equation"><button class="toolbarBtn" id="mathBtn" style="width: 50px;" @click="math(true)" @mousedown="handleBtn">Math</button></abbr>
             <abbr style="text-decoration: none;" title="Toggle safe pasting"><button class="toolbarBtn" id="safepasteBtn" style="width: 85px;" @click="safepaste" @mousedown="handleBtn">Safe Paste</button></abbr>
+            
+            <button id="saveBtn" v-on:click="save" v-if="(noteContent != lastSave) || (noteName != lastName)">Save</button>
+            <button id="savedBtn" v-on:click="save" v-if="(noteContent == lastSave) && (noteName == lastName)">Saved</button>
+            <p id="removeBtn" v-on:click="remove">Delete note</p>
         </div>
         <div id="highlightDropdown">
             <button @click="highlight('clear')" @mousedown="handleBtn"><b>Clear</b></button><br>
@@ -29,13 +33,12 @@
         <div class="editor" @click="handleClick">
             <mathEditor v-if="mathEditor" v-bind:lastLatex="lastLatex" @sendData="insertMath" />
             <div id="textarea" contenteditable @input="handleInput" @paste="handlePaste" @keyup="getStyle" @click="getStyle" spellcheck="false"></div>
-            <button v-on:click="save">Save</button>
-            <button v-on:click="load">Load</button>
         </div>
     </div>
 </template>
 
 <script>
+import axios from 'axios';
 import mathEditor from '../components/mathEditor';
 
 export default {
@@ -46,8 +49,10 @@ export default {
     data() {
         return {
             noteId: null,
-            noteName: "My note name",
+            noteName: "",
             noteContent: "",
+            lastSave: "",
+            lastName: "",
             focused: false,
             mathEditor: false,
             lastMath: "",
@@ -343,15 +348,44 @@ export default {
                 document.querySelector("#headingBtn").classList.remove("toolbarHighlight");
         },
         save: function() {
-            
+            axios(process.env.VUE_APP_SERVER + "/save", {
+                method: "post",
+                data: {id: this.noteId, data: this.noteContent, name: this.noteName},
+                withCredentials: true
+            }).then(response => {
+                console.log(response.data);
+                this.lastSave = this.noteContent;
+                this.lastName = this.noteName;
+            });
         },
         load: function() {
-            this.noteContent = this.noteContent + this.noteContent;
-            document.getElementById("textarea").innerHTML = this.noteContent;
+            axios(process.env.VUE_APP_SERVER + "/notes", {
+                method: "post",
+                data: {id: this.noteId},
+                withCredentials: true
+            }).then(response => {
+                console.log(response.data[0]);
+                this.noteName = response.data[0].name;
+                this.noteContent = response.data[0].data;
+                document.getElementById("textarea").innerHTML = this.noteContent;
+                this.lastSave = this.noteContent;
+                this.lastName = this.noteName;
+            });
+        },
+        remove: function() {
+            axios(process.env.VUE_APP_SERVER + "/remove", {
+                method: "post",
+                data: {id: this.noteId, data: this.noteContent, name: this.noteName},
+                withCredentials: true
+            }).then(response => {
+                console.log(response.data);
+                window.location.replace("/notes");
+            });
         }
     },
-    async created() {
-        this.noteId = this.$route.params.noteId; 
+    created() {
+        this.noteId = this.$route.params.noteId;
+        this.load();
     }
 }
 </script>
@@ -471,5 +505,36 @@ img {
 }
 ::-moz-selection {
   background: rgb(215, 234, 255);
+}
+#saveBtn {
+    float: right;
+    background-color: rgb(75, 117, 255);
+    color: white;
+    font-size: 14px;
+    border: 2px solid rgb(75, 117, 255);
+    border-radius: 5px;
+    padding: 6px 15px;
+    cursor: pointer;
+    margin-top: -12px;
+}
+#savedBtn {
+    float: right;
+    background-color: rgb(160, 160, 160);
+    color: white;
+    font-size: 14px;
+    border: 2px solid rgb(160, 160, 160);
+    border-radius: 5px;
+    padding: 6px 15px;
+    cursor: pointer;
+    margin-top: -12px;
+}
+#removeBtn {
+    font-weight: 100;
+    text-decoration: underline;
+    float: right;
+    color: rgb(80, 80, 80);
+    font-size: 12px;
+    cursor: pointer;
+    margin: 6px 10px 0 0;
 }
 </style>

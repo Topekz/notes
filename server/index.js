@@ -7,7 +7,9 @@ const cookieParser = require('cookie-parser')
  
 const app = express();
 
-app.use(bodyParser.json())
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+
 app.use(morgan("combined"));
 app.use(cors({credentials: true, origin: true}));
 app.use(cookieParser());
@@ -31,6 +33,9 @@ app.use("/register", registerRoute);
 // Login user
 const loginRoute = require("./routes/login.js");
 app.use("/login", loginRoute);
+// Logout user
+const logoutRoute = require("./routes/logout.js");
+app.use("/logout", logoutRoute);
 // Close user account
 const closeRoute = require("./routes/close.js");
 app.use("/close", closeRoute);

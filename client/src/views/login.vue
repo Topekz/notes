@@ -5,7 +5,7 @@
             <p v-if="errorMsg.length > 0">{{ errorMsg }}</p>
             <input v-model="name" type="text" name="name" id="name">
             <input v-model="password" type="password" name="password" id="password">
-            <button @click="register" id="submit">Log In</button>
+            <button @click="login" id="submit">Log In</button>
         </div>
     </div>
 </template>
@@ -23,13 +23,14 @@ export default {
         }
     },
     methods: {
-        register: function() {
+        login: function() {
             axios(process.env.VUE_APP_SERVER + '/login', {
                 method: 'post',
                 data: {username: this.name, password: this.password},
                 withCredentials: true
             }).then(response => {
                 console.log(response.data);
+                window.location.replace("/notes");
             });
         }
     }
