@@ -1,41 +1,84 @@
 <template>
     <div class="container">
-        <h1>Register</h1>
-        <div class="register">
-            <p v-if="errorMsg.length > 0">{{ errorMsg }}</p>
-            <input v-model="name" pattern="^[0-9a-zA-Z]+$" style="text-transform: lowercase" type="text" name="name" id="name">
-            <input v-model="password" pattern="^[a-zA-Z\d\-_.,#@!?€$&%+*^'/\\s]+$" type="password" name="password" id="password">
-            <button @click="register" id="submit">Submit</button>
+        <div id="header">
+            <div id="background"></div>
+            <div id="left">
+                <p id="title">Fast and easy way<br>to take notes.</p>
+                <p id="desc">Take, organize and share notes easily<br>using a simple interface. Perfect for school.</p>
+                <button @click="$router.push('/login')" style="margin-top: 25px;" class="strokeBtn">Log In</button>
+                <button @click="$router.push('/register')" style="margin-left: 10px;" class="filledBtn">Get Started</button>
+            </div>
+            <img src="../assets/FramedScreenshot.png" alt="note screenshot">
         </div>
     </div>
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
     name: "landing",
     data() {
         return {
-            name: "",
-            password: "",
-            errorMsg: ""
+
         }
     },
     methods: {
-        register: function() {
-            axios(process.env.VUE_APP_SERVER + '/register', {
-                method: 'post',
-                data: {username: this.name, password: this.password},
-                withCredentials: true
-            }).then(response => {
-                console.log(response.data);
-            });
-        }
+
     }
 }
 </script>
 
-<style>
-
+<style scoped>
+#header {
+    
+}
+#header #background {
+    background-color: #dceaff;
+    position: fixed;
+    width: 120%;
+    height: 43vw;
+    transform: rotate(3deg);
+    z-index: -1;
+    top: -50px;
+    left: -50px;
+}
+#header #left {
+    display: inline-block;
+    margin: 80px 0 0 100px;
+}
+#header #title {
+    color: #303030;
+    font-size: 3.5vw;
+    font-weight: 400;
+    margin-bottom: 0;
+}
+#header #desc {
+    color: #404040;
+    font-size: 1.5vw;
+}
+#header img {
+    height: auto;
+    width: 50vw;
+    float: right;
+    margin: 90px 100px 0 0;
+}
+.filledBtn {
+  background-color: rgb(75, 117, 255);
+  color: white;
+  font-size: 1.2vw;
+  border: 2px solid rgb(75, 117, 255);
+  border-radius: 5px;
+  padding: 0.8vw 2vw;
+  cursor: pointer;
+  font-weight: 600;
+}
+.strokeBtn {
+  background-color: transparent;
+  color: rgb(75, 117, 255);
+  font-size: 1.2vw;
+  border: 2px solid rgb(75, 117, 255);
+  border-radius: 5px;
+  padding: 0.8vw 1.8vw;
+  cursor: pointer;
+  font-weight: 600;
+}
 </style>

@@ -19,8 +19,8 @@
             <abbr style="text-decoration: none;" title="Insert math equation"><button class="toolbarBtn" id="mathBtn" style="width: 50px;" @click="math(true)" @mousedown="handleBtn">Math</button></abbr>
             <abbr style="text-decoration: none;" title="Toggle safe pasting"><button class="toolbarBtn" id="safepasteBtn" style="width: 85px;" @click="safepaste" @mousedown="handleBtn">Safe Paste</button></abbr>
             
-            <button id="saveBtn" v-on:click="save" v-if="(noteContent != lastSave) || (noteName != lastName)">Save</button>
-            <button id="savedBtn" v-on:click="save" v-if="(noteContent == lastSave) && (noteName == lastName)">Saved</button>
+            <button id="saveBtn" v-on:click="save" v-if="(noteContent != lastSave) || (noteName != lastName)" @mousedown="handleBtn">Save</button>
+            <button id="savedBtn" v-on:click="save" v-if="(noteContent == lastSave) && (noteName == lastName)" @mousedown="handleBtn">Saved</button>
             <p id="removeBtn" v-on:click="remove">Delete note</p>
         </div>
         <div id="highlightDropdown">
@@ -255,7 +255,7 @@ export default {
             var all_ranges_parent_tags = [];
                 
             // Current menu tags
-            var menu_tags = [ 'B', 'I', 'UL', 'U', 'S', 'SUP', 'SUB', 'H2' ];
+            var menu_tags = [ 'B', 'I', 'UL', 'U', 'STRIKE', 'SUP', 'SUB', 'H2' ];
                 
             // Will hold common tags from all ranges
             var menu_tags_common = [];
@@ -327,7 +327,7 @@ export default {
             else
                 document.querySelector("#underlineBtn").classList.remove("toolbarHighlight");
 
-            if(menu_tags_common.indexOf('S') != -1)
+            if(menu_tags_common.indexOf('STRIKE') != -1)
                 document.querySelector("#strikeBtn").classList.add("toolbarHighlight");
             else
                 document.querySelector("#strikeBtn").classList.remove("toolbarHighlight");
@@ -390,12 +390,9 @@ export default {
 }
 </script>
 
-<style>
-body {
-    background-color: rgb(248, 249, 250);
-}
+<style scoped>
 .container {
-
+    background-color: rgb(248, 249, 250);
 }
 .editor {
     margin: auto;

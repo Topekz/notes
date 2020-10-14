@@ -11,9 +11,13 @@ export default {
 </script>
 
 <style>
+html {
+  scroll-behavior: smooth;
+}
 body {
-    margin: 0;
-    padding: 0;
-    font-family:Arial, Helvetica, sans-serif;
+  padding: 0;
+  margin: 0;
+  font-family:Arial, Helvetica, sans-serif;
+  background-color: white;
 }
 </style>

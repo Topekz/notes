@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 
 import landing from './views/landing';
+import register from './views/register';
 import login from './views/login';
 import notes from './views/notes';
 import note from './views/note';
@@ -14,6 +15,10 @@ export default new Router({
         {
             component: landing,
             path: '/'
+        },
+        {
+            component: register,
+            path: '/register'
         },
         {
             component: login,
