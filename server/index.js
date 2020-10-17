@@ -27,6 +27,9 @@ app.use("/user", userRoute);
 // Get note data
 const notesRoute = require("./routes/notes.js");
 app.use("/notes", notesRoute);
+// Get folder data
+const foldersRoute = require("./routes/folders.js");
+app.use("/folders", foldersRoute);
 // Register user
 const registerRoute = require("./routes/register.js");
 app.use("/register", registerRoute);
@@ -40,11 +43,17 @@ app.use("/logout", logoutRoute);
 const closeRoute = require("./routes/close.js");
 app.use("/close", closeRoute);
 // Create a new note
-const createRoute = require("./routes/create.js");
-app.use("/create", createRoute);
+const createNoteRoute = require("./routes/createNote.js");
+app.use("/createnote", createNoteRoute);
 // Remove a note
-const removeRoute = require("./routes/remove.js");
-app.use("/remove", removeRoute);
+const removeNoteRoute = require("./routes/removeNote.js");
+app.use("/removenote", removeNoteRoute);
+// Create a new folder
+const createFolderRoute = require("./routes/createFolder.js");
+app.use("/createfolder", createFolderRoute);
+// Remove a folder
+const removeFolderRoute = require("./routes/removeFolder.js");
+app.use("/removefolder", removeFolderRoute);
 // Save note to database
 const saveRoute = require("./routes/save.js");
 app.use("/save", saveRoute);

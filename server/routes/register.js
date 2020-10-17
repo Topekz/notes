@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const User = require("../models/userModel.js");
-const Note = require("../models/noteModel.js");
 
 router.post("/", async (req,res) => {
     var username = req.body.username.toLowerCase();
@@ -35,12 +34,12 @@ router.post("/", async (req,res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create username
+    // Create user
     const user = new User({
         username: username,
         password: hashedPassword
     });
-    // Save username to database
+    // Save user to database
     try {
         await user.save();
         return res.json({success: true, msg: "User registered", data: req.body});

@@ -373,14 +373,16 @@ export default {
             });
         },
         remove: function() {
-            axios(process.env.VUE_APP_SERVER + "/remove", {
-                method: "post",
-                data: {id: this.noteId, data: this.noteContent, name: this.noteName},
-                withCredentials: true
-            }).then(response => {
-                console.log(response.data);
-                window.location.replace("/notes");
-            });
+            if(confirm("Permanently remove this note?")) {
+                axios(process.env.VUE_APP_SERVER + "/removenote", {
+                    method: "post",
+                    data: {id: this.noteId},
+                    withCredentials: true
+                }).then(response => {
+                    console.log(response.data);
+                    window.location.replace("/notes");
+                });
+            }
         }
     },
     created() {
@@ -391,7 +393,17 @@ export default {
 </script>
 
 <style scoped>
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
 .container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: auto;
     background-color: rgb(248, 249, 250);
 }
 .editor {
