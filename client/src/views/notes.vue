@@ -142,14 +142,13 @@ export default {
                 window.location.replace("/");
             });
         },
-        closeAccount: function() {
-            axios(process.env.VUE_APP_SERVER + '/close', {
+        closeAccount: async function() {
+            await axios(process.env.VUE_APP_SERVER + '/close', {
                 method: 'post',
                 withCredentials: true
-            }).then(function() {
-                this.logout();
-                window.location.replace("/");
             });
+            this.logout();
+            window.location.replace("/");
         }
     },
     mounted() {
@@ -316,6 +315,7 @@ export default {
     padding: 5px 5px 5px 5.5px;
     margin-right: 10px;
     border-radius: 20px;
+    transition: all .2s;
 }
 .folder .more {
     display: none;
@@ -323,6 +323,7 @@ export default {
     padding: 5px 5px 5px 5.5px;
     margin-right: 10px;
     border-radius: 20px;
+    transition: all .2s;
 }
 .moreIcon {
     margin-bottom: -4px;

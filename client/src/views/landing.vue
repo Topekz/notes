@@ -23,6 +23,11 @@ export default {
     },
     methods: {
 
+    },
+    mounted() {
+        if(this.$cookie.get('loggedin') == "true") {
+            window.location.replace("/notes");
+        }
     }
 }
 </script>

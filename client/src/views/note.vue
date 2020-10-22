@@ -385,9 +385,13 @@ export default {
             }
         }
     },
-    created() {
-        this.noteId = this.$route.params.noteId;
-        this.load();
+    mounted() {
+        if(this.$cookie.get('loggedin') == "true") {
+            this.noteId = this.$route.params.noteId;
+            this.load();
+        } else {
+            window.location.replace("/login");
+        }
     }
 }
 </script>
