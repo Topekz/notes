@@ -15,7 +15,15 @@ const noteSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    date: {
+    notebook: {
+        type: String,
+        required: true
+    },
+    createDate: {
+        type: Date,
+        default: Date.now
+    },
+    editDate: {
         type: Date,
         default: Date.now
     }

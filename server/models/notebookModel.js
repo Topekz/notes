@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const folderSchema = mongoose.Schema({
+const notebookSchema = mongoose.Schema({
     name: {
         type: String,
         min: 1,
@@ -11,13 +11,10 @@ const folderSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    notes: {
-        type: Array
-    },
     date: {
         type: Date,
         default: Date.now
     }
 });
 
-module.exports = mongoose.model("folder", folderSchema);
+module.exports = mongoose.model("notebook", notebookSchema);

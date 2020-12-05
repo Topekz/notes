@@ -4,8 +4,10 @@ import Router from 'vue-router';
 import landing from './views/landing';
 import register from './views/register';
 import login from './views/login';
-import notes from './views/notes';
+import home from './views/home';
+import notebook from './views/notebook';
 import note from './views/note';
+import test from './views/test';
 
 Vue.use(Router);
 
@@ -25,12 +27,20 @@ export default new Router({
             path: '/login'
         },
         {
-            component: notes,
-            path: '/notes'
+            component: home,
+            path: '/home'
+        },
+        {
+            component: notebook,
+            path: '/notebook/:notebookId'
         },
         {
             component: note,
-            path: '/notes/:noteId'
+            path: '/notebook/:notebookId/:noteId'
+        },
+        {
+            component: test,
+            path: '/test'
         }
     ]
 });

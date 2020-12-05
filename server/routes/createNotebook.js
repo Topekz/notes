@@ -1,21 +1,21 @@
 const express = require("express");
 const router = express.Router();
-const Folder = require("../models/folderModel.js");
+const Notebook = require("../models/notebookModel.js");
 const verify = require("./verify.js");
 
 router.post("/", verify, async (req,res) => {
     var user = req.user.id;
     var name = req.body.name;
 
-    // Create folder
-    const folder = new Folder({
+    // Create notebook
+    const notebook = new Notebook({
         name: name,
         owner: user
     });
-    // Save folder to database
+    // Save notebook to database
     try {
-        await folder.save();
-        return res.json({success: true, msg: "Folder created", data: req.body, id: folder._id});
+        await notebook.save();
+        return res.json({success: true, msg: "Notebook created", data: req.body, id: folder._id});
     } catch(error) {
         res.json({success: false, msg: "Error", data: error});
     }
@@ -23,7 +23,7 @@ router.post("/", verify, async (req,res) => {
 
 // Temporary
 router.get("/", (req,res) => {
-    Folder
+    Notebook
     .find()
     .exec(function(err, data) {
         return res.send(data);

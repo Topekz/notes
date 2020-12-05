@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const Folder = require("../models/folderModel.js");
+const Notebook = require("../models/notebookModel.js");
 const verify = require("./verify.js");
 
 router.post("/", verify, (req,res) => {
-    // Find folder and return data
-    Folder
+    // Find notebook and return data
+    Notebook
     .find({"_id": req.body.id})
     .exec(function(err, data) {
         return res.send(data);
@@ -13,8 +13,8 @@ router.post("/", verify, (req,res) => {
 });
 
 router.get("/", verify, (req,res) => {
-    // Find folders and return data
-    Folder
+    // Find notebooks and return data
+    Notebook
     .find({"owner": req.user.id})
     .sort({name: 1})
     .exec(function(err, data) {

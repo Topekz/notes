@@ -37,7 +37,7 @@ export default {
                     console.log(response.data);
                     if(response.data.success == true) {
                         this.errorMsg = "";
-                        window.location.replace("/notes");
+                        window.location.replace("/home");
                     } else {
                         this.name = "";
                         this.password = "";
