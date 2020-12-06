@@ -31,7 +31,7 @@
         <div class="editor" @click="handleClick">
             <div class="info">
                 <h1>{{ noteName }}</h1>
-                <div style="width: 100%; height: 1px; background-color: rgb(220, 220, 220);"></div>
+                <hr style="color: rgb(255, 255, 255);"/>
             </div>
             <div id="textarea" placeholder="Type something..." contenteditable @input="handleInput" @paste="handlePaste" @keyup="getStyle" @click="getStyle" spellcheck="false"></div>
         </div>
@@ -115,7 +115,8 @@ export default {
             }
         },
         hline: function() {
-            document.execCommand('insertHorizontalRule', false, '');
+            document.execCommand('insertHTML', false, '<hr style="color: rgb(255, 255, 255);"/>');
+            //document.execCommand('insertHorizontalRule', false, '');
         },
         heading: function() {
             document.execCommand('formatBlock', false, 'h2');
@@ -402,8 +403,8 @@ export default {
 </script>
 
 <style scoped>
-html, body {
-    
+.container {
+    margin: 0 0 0 240px;
 }
 .toolbar {
     background-color: rgb(255, 255, 255);
@@ -440,7 +441,7 @@ html, body {
     margin: 50px auto auto auto;
     width: 900px;
     box-sizing: border-box;
-    padding: 25px 40px 25px 40px;
+    padding: 25px 40px 10px 40px;
 }
 .info h1 {
     font-size: 40px;

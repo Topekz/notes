@@ -10,7 +10,7 @@ router.post("/", verify, (req,res) => {
             return res.send(err);
         }
         else{
-            return res.send("Updated");
+            return res.send("Saved");
         }
     });
 });

@@ -6,11 +6,13 @@ const verify = require("./verify.js");
 router.post("/", verify, async (req,res) => {
     var user = req.user.id;
     var name = req.body.name;
+    var notebook = req.body.notebook;
 
     // Create note
     const note = new Note({
         name: name,
-        owner: user
+        owner: user,
+        notebook: notebook
     });
     // Save note to database
     try {

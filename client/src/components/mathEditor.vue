@@ -1,7 +1,9 @@
 <template>
     <div id="mathBackground">
         <div id="mathEditor">
-            <input @keyup.enter="sendData" type="text" id="mathInput" v-model="latex" />
+            <input @keyup.enter="sendData" type="text" id="mathInput" v-model="latex" placeholder="Write LaTeX..."/>
+            <div id="latex" v-if="latex != ''"><vue-mathjax :formula="'$' + latex + '$'"></vue-mathjax></div>
+            <br>
             <button @click="sendData">Insert</button>
         </div>
     </div>
@@ -42,7 +44,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 #mathBackground {
     position: fixed;
     top: 0;
@@ -54,14 +56,24 @@ export default {
 }
 #mathEditor {
     width: 600px;
+    background-color: white;
     margin: 120px auto auto auto;
+    border-radius: 5px;
+    border: 1px solid rgb(185, 185, 185);
+    border-radius: 5px;
 }
 #mathInput {
     width: 600px;
     height: 60px;
     font-size: 16px;
-    padding: 10px;
+    padding: 15px;
     box-sizing: border-box;
+    border: none;
+    border-bottom: 1px solid rgb(185, 185, 185);
+    border-radius: 5px 5px 0 0;
+}
+#latex {
+    margin: 15px 0 -15px 15px;
 }
 #mathEditor button {
     background-color: rgb(52, 120, 230);
@@ -73,6 +85,6 @@ export default {
     width: 90px;
     height: 35px;
     cursor: pointer;
-    margin: 5px 10px 0 0;
+    margin: 15px 0 15px 15px;
 }
 </style>

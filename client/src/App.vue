@@ -27,13 +27,13 @@ html {
 }
 body {
   padding: 0;
-  margin: 0 0 0 240px;
-  font-family:Arial, Helvetica, sans-serif;
+  margin: 0 0 0 0;
+  font-family: Arial, Helvetica, sans-serif;
   background-color: white;
 }
 #sidebar {
   z-index: 9;
-  margin: 0 0 0 -240px;
+  margin: 0 0 0 0;
   width: 240px;
 }
 </style>

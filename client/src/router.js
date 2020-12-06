@@ -7,7 +7,6 @@ import login from './views/login';
 import home from './views/home';
 import notebook from './views/notebook';
 import note from './views/note';
-import test from './views/test';
 
 Vue.use(Router);
 
@@ -37,10 +36,6 @@ export default new Router({
         {
             component: note,
             path: '/notebook/:notebookId/:noteId'
-        },
-        {
-            component: test,
-            path: '/test'
         }
     ]
 });

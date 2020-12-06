@@ -31,7 +31,6 @@ export default {
       return {
           user: "",
           notes: [],
-          notebooks: [],
           notebookId: "",
       }
     },
@@ -52,56 +51,24 @@ export default {
                 this.notes = response.data;
             });
         },
-        getNotebooks: function() {
-            axios(process.env.VUE_APP_SERVER + "/notebooks", {
-                method: "get",
-                withCredentials: true
-            }).then(response => {
-                this.notebooks = response.data;
-            });
-        },
-        openNotebook: function(notebook) {
-            this.$router.push("/" + this.notebooks[notebook]._id);
-        },
         openNote: function(note) {
             this.$router.push("/notebook/" + this.notebookId + "/" + this.notes[note]._id);
         },
-        createNotebook: async function() {
-            let notebookName = "Notebook #" + (this.notebooks.length+1);
-            await axios(process.env.VUE_APP_SERVER + '/createnotebook', {
-                method: 'post',
-                data: {name: notebookName},
-                withCredentials: true
-            });
-            this.getNotebooks();
-        },
         createNote: function() {
             let noteName = "Note #" + (this.notes.length+1);
+            let noteBook = this.notebookId;
             axios(process.env.VUE_APP_SERVER + '/createnote', {
                 method: 'post',
-                data: {name: noteName},
+                data: {name: noteName, notebook: noteBook},
                 withCredentials: true
             }).then(response => {
-                this.$router.push("/notes/" + response.data.id);
+                console.log(response);
+                this.$router.push(this.$route.path + "/" + response.data.id);
             });
-        },
-        moreNotebook: function(notebook) {
-            console.log(notebook);
-            this.removeNotebook(notebook);
         },
         moreNote: function(note) {
             console.log(note);
             this.removeNote(note);
-        },
-        removeNotebook: async function(notebook) {
-            if(confirm("Permanently remove this notebook?")) {
-                await axios(process.env.VUE_APP_SERVER + "/removenotebook", {
-                    method: "post",
-                    data: {id: this.notebooks[notebook]._id},
-                    withCredentials: true
-                });
-                this.getNotebooks();
-            }
         },
         removeNote: async function(note) {
             if(confirm("Permanently remove this note?")) {
@@ -132,9 +99,9 @@ export default {
     },
     mounted() {
         if(this.$cookie.get('loggedin') == "true") {
+            this.notebookId = this.$route.params.notebookId;
             this.getUser();
             this.getNotes();
-            this.notebookId = this.$route.params.notebookId;
         } else {
             window.location.replace("/login");
         }
@@ -143,5 +110,7 @@ export default {
 </script>
 
 <style scoped>
-
+.container {
+    margin: 0 0 0 240px;
+}
 </style>

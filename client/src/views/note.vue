@@ -1,24 +1,21 @@
 <template>
     <div class="container">
-        <!-- <input type="text" v-model="noteName" id="title">
-        <button id="saveBtn" v-on:click="save" v-if="(noteContent != lastSave) || (noteName != lastName)" @mousedown="handleBtn">Save</button>
-        <button id="savedBtn" v-on:click="save" v-if="(noteContent == lastSave) && (noteName == lastName)" @mousedown="handleBtn">Saved</button>
-        <p id="removeBtn" v-on:click="remove">Delete note</p> -->
         <div class="toolbar">
             <abbr style="text-decoration: none;" title="Bold"><button class="toolbarBtn" id="boldBtn" @click="bold" @mousedown="handleBtn"><b>B</b></button></abbr>
             <abbr style="text-decoration: none;" title="Italic"><button class="toolbarBtn" id="italicBtn" @click="italic" @mousedown="handleBtn"><b><i>I</i></b></button></abbr>
             <abbr style="text-decoration: none;" title="Underline"><button class="toolbarBtn" id="underlineBtn" @click="underline" @mousedown="handleBtn"><b><u>U</u></b></button></abbr>
             <abbr style="text-decoration: none;" title="Strikethrough"><button class="toolbarBtn" id="strikeBtn" @click="strike" @mousedown="handleBtn"><b><s>S</s></b></button></abbr>
-            <abbr style="text-decoration: none;" title="Insert heading"><button class="toolbarBtn" id="headingBtn" @click="heading" @mousedown="handleBtn"><b>H</b></button></abbr>
             <abbr style="text-decoration: none;" title="Type superscript"><button class="toolbarBtn" id="superscriptBtn" @click="superscript" @mousedown="handleBtn"><b>X<sup style="vertical-align: top; font-size: 0.7em;">2</sup></b></button></abbr>
             <abbr style="text-decoration: none;" title="Type subscript"><button class="toolbarBtn" id="subscriptBtn" @click="subscript" @mousedown="handleBtn"><b>X<sub style="vertical-align: bottom; font-size: 0.7em;">2</sub></b></button></abbr>
             <abbr style="text-decoration: none;" title="Clear formatting"><button class="toolbarBtn" id="clearBtn" @click="clear" @mousedown="handleBtn"><b><i><s>T</s></i></b></button></abbr>
+            <abbr style="text-decoration: none;" title="Insert heading"><button class="toolbarBtn" id="headingBtn" @click="heading" @mousedown="handleBtn"><b>H</b></button></abbr>
             <abbr style="text-decoration: none;" title="Insert horizontal rule"><button class="toolbarBtn" id="hlineBtn" @click="hline" @mousedown="handleBtn"><b>–</b></button></abbr>
             <abbr style="text-decoration: none;" title="Highlight text"><button class="toolbarBtn" id="highlightBtn" style="width: 75px;" @click="highlight" @mousedown="handleBtn">Highlight</button></abbr>
             <input type="file" id="imageSelect" style="display: none;" @change="image"/>
             <abbr style="text-decoration: none;" title="Insert image"><button class="toolbarBtn" id="imageBtn" style="width: 55px;" onclick="document.querySelector('#imageSelect').click()">Image</button></abbr>
             <abbr style="text-decoration: none;" title="Insert math equation"><button class="toolbarBtn" id="mathBtn" style="width: 50px;" @click="math(true)" @mousedown="handleBtn">Math</button></abbr>
-            <abbr style="text-decoration: none;" title="Toggle safe pasting"><button class="toolbarBtn" id="safepasteBtn" style="width: 85px;" @click="safepaste" @mousedown="handleBtn">Safe Paste</button></abbr>
+            <p id="saving" v-if="timer != null">Saving</p>
+            <p id="saved" v-if="(noteContent == lastSave) && (noteName == lastName) && (timer == null)">Saved</p>
         </div>
         <div id="highlightDropdown">
             <button @click="highlight('clear')" @mousedown="handleBtn"><b>Clear</b></button><br>
@@ -30,10 +27,12 @@
         <mathEditor v-if="mathEditor" v-bind:lastLatex="lastLatex" @sendData="insertMath" />
         <div class="editor" @click="handleClick">
             <div class="info">
-                <h1>{{ noteName }}</h1>
-                <div style="width: 100%; height: 1px; background-color: rgb(220, 220, 220);"></div>
+                <!-- <h1>{{ noteName }}</h1> -->
+                <input type="text" v-model="noteName" id="title" placeholder="Enter a title..." @input="inputDebounce">
+                <p id="removeBtn" v-on:click="remove">Delete note</p>
+                <hr style="color: rgb(255, 255, 255);"/>
             </div>
-            <div id="textarea" placeholder="Type something..." contenteditable @input="handleInput" @paste="handlePaste" @keyup="getStyle" @click="getStyle" spellcheck="false"></div>
+            <div id="textarea" placeholder="Start writing here..." contenteditable @input="handleText(); inputDebounce();" @keyup="getStyle" @click="getStyle" spellcheck="false"></div>
         </div>
     </div>
 </template>
@@ -58,7 +57,7 @@ export default {
             mathEditor: false,
             lastMath: "",
             lastLatex: "",
-            safePaste: false
+            timer: null
         }
     },
     methods: {
@@ -115,7 +114,8 @@ export default {
             }
         },
         hline: function() {
-            document.execCommand('insertHorizontalRule', false, '');
+            document.execCommand('insertHTML', false, '<hr style="color: rgb(255, 255, 255);"/>');
+            //document.execCommand('insertHorizontalRule', false, '');
         },
         heading: function() {
             document.execCommand('formatBlock', false, 'h2');
@@ -149,30 +149,18 @@ export default {
                     break;
             }
         },
-        safepaste: function() {
-            if(!this.safePaste) {
-                this.safePaste = true;
-                document.querySelector("#safepasteBtn").classList.add("toolbarHighlight");
-            } else {
-                this.safePaste = false;
-                document.querySelector("#safepasteBtn").classList.remove("toolbarHighlight");
-            }
+        inputDebounce: function() {
+            window.clearTimeout(this.timer);
+            this.timer = window.setTimeout(() => {
+                this.save();
+                this.timer = null;
+            }, 2000);
         },
-        handleInput: function() {
+        handleText: function() {
             this.noteContent = document.getElementById("textarea").innerHTML;
             if(this.noteContent == "<div><br></div>" || this.noteContent == "<br>") {
                 document.getElementById("textarea").innerHTML = "";
                 this.noteContent = "";
-            }
-        },
-        handlePaste: function(e) {
-            if(this.safePaste) {
-                // Prevent default behaviour
-                e.preventDefault();
-                // Get clipboard data
-                var clipboard = e.clipboardData.getData('text/plain');
-                // Insert text
-                document.execCommand('insertText', false, clipboard);
             }
         },
         handleBtn: function(e) {
@@ -402,17 +390,16 @@ export default {
 </script>
 
 <style scoped>
-html, body {
-    
+.container {
+    margin: 0 0 0 240px;
 }
 .toolbar {
     background-color: rgb(255, 255, 255);
     height: auto;
     width: 100%;
-    padding: 0 0 0 10px;
+    padding: 0 0 0 30px;
     position: fixed;
     top: 0;
-    
     white-space: nowrap;
     overflow: hidden;
     z-index: 1;
@@ -440,7 +427,7 @@ html, body {
     margin: 50px auto auto auto;
     width: 900px;
     box-sizing: border-box;
-    padding: 25px 40px 25px 40px;
+    padding: 25px 40px 10px 40px;
 }
 .info h1 {
     font-size: 40px;
@@ -470,33 +457,30 @@ html, body {
     word-wrap: break-word;
     width: 900px;
     margin: auto;
-    color: rgb(50, 50, 50);
+    color: rgb(40, 40, 40);
     font-size: 16px;
+    line-height: 20px;
 }
 #textarea img {
     max-width: 900px;
+    cursor: pointer;
 }
 #title {
     display: inline-block;
-    padding: 2px 10px;
-    margin: 8px 2px 8px 10px;
-    color: rgb(50, 50, 50);
-    font-size: 17px;
+    color: rgb(40, 40, 40);
+    font-size: 36px;
+    font-weight: bold;
+    margin: 0 0 20px 0;
     cursor: pointer;
-    border-radius: 5px;
-}
-#title:focus {
-    background-color: rgb(240, 240, 240);
-    border-radius: 5px;
-}
-#title:hover {
-    background-color: rgb(240, 240, 240);
-    border-radius: 5px;
+    border: none;
+    background-color: transparent;
+    width: 100%;
+    cursor: text;
 }
 #highlightDropdown {
     background-color: white;
     position: fixed;
-    margin: 5px 0 0 374px;
+    margin: 5px 0 0 291px;
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.151);
     padding: 5px 10px 10px 10px;
     border-radius: 5px;
@@ -517,44 +501,34 @@ html, body {
 #highlightDropdown button:hover {
     background-color: rgb(240, 240, 240);
 }
-img {
-    cursor: pointer;
-}
 ::selection {
   background: rgb(215, 234, 255);
 }
 ::-moz-selection {
   background: rgb(215, 234, 255);
 }
-#saveBtn {
+#saving {
+    color: rgb(115, 115, 115);
     float: right;
-    background-color: rgb(75, 117, 255);
-    color: white;
     font-size: 14px;
-    border: 2px solid rgb(75, 117, 255);
-    border-radius: 5px;
-    padding: 6px 15px;
-    cursor: pointer;
-    margin-top: -12px;
+    margin: 13px 310px 0 0;
+    margin-left: 10px;
+    display: inline;
 }
-#savedBtn {
+#saved {
+    color: rgb(75, 117, 255);
     float: right;
-    background-color: rgb(160, 160, 160);
-    color: white;
-    font-size: 14px;
-    border: 2px solid rgb(160, 160, 160);
     border-radius: 5px;
-    padding: 6px 15px;
-    cursor: pointer;
-    margin-top: -12px;
+    font-size: 14px;
+    margin: 13px 310px 0 0;
+    display: inline;
 }
 #removeBtn {
     font-weight: 100;
-    text-decoration: underline;
     float: right;
     color: rgb(80, 80, 80);
     font-size: 12px;
     cursor: pointer;
-    margin: 6px 10px 0 0;
+    margin: -10px 1px 0 0;
 }
 </style>
